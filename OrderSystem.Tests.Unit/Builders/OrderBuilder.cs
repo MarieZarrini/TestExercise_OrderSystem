@@ -5,13 +5,13 @@ namespace OrderSystem.Tests.Unit
 	public class OrderBuilder
 	{
 		private int _userId;
-		private readonly List<OrderItem> _orderItems = new();
-		OrderItem OrderItem = new OrderItemBuilder().Build();
+		private List<OrderItem> _orderItems = new();
+		OrderItem orderItem = new OrderItemBuilder().Build();
 
 		public OrderBuilder()
 		{
 			_userId = 1;
-			_orderItems.Add(OrderItem);
+			_orderItems.Add(orderItem);
 		}
 
 
@@ -21,21 +21,21 @@ namespace OrderSystem.Tests.Unit
 			return this;
 		}
 
-		public OrderBuilder WithOrderItems(OrderItem orderItem)
+		public OrderBuilder WithOrderItems(List<OrderItem> orderItems)
 		{
-			_orderItems.Add(orderItem);
+			_orderItems = orderItems;
 			return this;
 		}
 
 		public OrderBuilder WithDefaultOrderItem(OrderItem orderItem)
 		{
-			OrderItem = orderItem;
+			this.orderItem = orderItem;
 			return this;
 		}
 
 		public Order Build()
 		{
-			var order = new Order(_userId, OrderItem);
+			var order = new Order(_userId, _orderItems);
 			return order;
 		}
 	}

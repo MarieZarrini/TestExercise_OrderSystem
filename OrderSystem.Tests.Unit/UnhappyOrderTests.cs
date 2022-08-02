@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using OrderSystem.BusinessExceptions;
+using System.Collections.Generic;
 using Xunit;
 
 namespace OrderSystem.Tests.Unit
@@ -7,13 +8,24 @@ namespace OrderSystem.Tests.Unit
 	public class UnhappyOrderTests
 	{
 		[Fact]
-		public void Order_Should_Throw_NullOrderItemException_If_OrderItem_Is_Null()
+		public void Order_Should_Throw_NullOrEmptyOrderItemsException_If_OrderItems_Is_Empty()
 		{
-			var orderBuilder = new OrderBuilder().WithDefaultOrderItem(null);
+			var orderItems = new List<OrderItem>();
+			var orderBuilder = new OrderBuilder().WithOrderItems(orderItems);
 
 			var order = () => orderBuilder.Build();
 
-			order.Should().Throw<NullOrderItemException>();
+			order.Should().Throw<NullOrEmptyOrderItemsException>();
+		}
+
+		[Fact]
+		public void Order_Should_Throw_NullOrEmptyOrderItemsException_If_OrderItems_Is_Nul()
+		{
+			var orderBuilder = new OrderBuilder().WithOrderItems(null);
+
+			var order = () => orderBuilder.Build();
+
+			order.Should().Throw<NullOrEmptyOrderItemsException>();
 		}
 
 		[Fact]
@@ -73,6 +85,43 @@ namespace OrderSystem.Tests.Unit
 			var addOrderItem = () => order.AddOrderItem(orderItem);
 
 			addOrderItem.Should().Throw<InvalidOrderStateException>();
+		}
+
+		[Fact]
+		public void Order_Should_Throw_InvalidOrderStateException_When_State_Is_Finalized_And_Try_To_Remove_From_OrderItem_List()
+		{
+			var orderItem = new OrderItemBuilder().Build();
+			var order = new OrderBuilder().Build();
+			order.SetOrderStateToFinalized();
+
+			var removeOrderItem = () => order.RemoveOrderItem(orderItem);
+
+			removeOrderItem.Should().Throw<InvalidOrderStateException>();
+		}
+
+		[Fact]
+		public void Order_Should_Throw_InvalidOrderStateException_When_State_Is_Shipped_And_Try_To_Remove_From_OrderItem_List()
+		{
+			var orderItem = new OrderItemBuilder().Build();
+			var order = new OrderBuilder().Build();
+
+			order.SetOrderStateToFinalized();
+			order.SetOrderStateToShipped();
+
+			var removeOrderItem = () => order.RemoveOrderItem(orderItem);
+
+			removeOrderItem.Should().Throw<InvalidOrderStateException>();
+		}
+
+		[Fact]
+		public void RemoveOrderItem_Should_Throw_NullOrEmptyOrderItemsException_When_OrderItems_Count_Equals_To_One()
+		{
+			var orderItem = new OrderItemBuilder().Build();
+			var order = new OrderBuilder().Build();
+
+			var removeOrderItem = () => order.RemoveOrderItem(orderItem);
+
+			removeOrderItem.Should().Throw<NullOrEmptyOrderItemsException>();
 		}
 	}
 }

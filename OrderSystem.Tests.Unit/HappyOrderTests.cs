@@ -68,5 +68,22 @@ namespace OrderSystem.Tests.Unit
 			order.OrderItems.Should().HaveCount(2);
 			order.OrderItems[1].Should().Be(orderItem);
 		}
+
+		[Fact]
+		public void OrderItem_Should_Remove_From_OrderItems_List_Correctly()
+		{
+			var orderItem = new OrderItemBuilder().Build();
+			var orderItems = new List<OrderItem>
+			{
+				orderItem,
+				orderItem
+			};
+
+			var order = new OrderBuilder().WithOrderItems(orderItems).Build();
+
+			order.RemoveOrderItem(orderItem);
+
+			order.OrderItems.Should().HaveCount(1);
+		}
 	}
 }
