@@ -8,20 +8,20 @@ namespace OrderSystem
 		public OrderState State { get; private set; }
 		public List<OrderItem> OrderItems { get; private set; } = new();
 
-		public Order(int userId, OrderItem orderItem)
+		public Order(int userId, List<OrderItem> orderItems)
 		{
-			GuardAgainstInvalidOrderItem(orderItem);
+			GuardAgainstInvalidOrderItem(orderItems);
 
 			UserId = userId;
 			State = OrderState.Created;
-			OrderItems.Add(orderItem);
+			OrderItems.AddRange(orderItems);
 		}
 
 
-		private static void GuardAgainstInvalidOrderItem(OrderItem orderItem)
+		private static void GuardAgainstInvalidOrderItem(List<OrderItem> orderItems)
 		{
-			if (orderItem == null)
-				throw new NullOrderItemException();
+			if (orderItems == null || orderItems.Count == 0)
+				throw new NullOrEmptyOrderItemsException();
 		}
 
 		public void SetOrderStateToFinalized()
@@ -42,12 +42,24 @@ namespace OrderSystem
 
 		public void AddOrderItem(OrderItem orderItem)
 		{
-			GuardAgainstInvalidOrderItem(orderItem);
+			if (orderItem is null)
+				throw new NullOrderItemException();
 
 			if (State != OrderState.Created)
 				throw new InvalidOrderStateException();
 
 			OrderItems.Add(orderItem);
+		}
+
+		public void RemoveOrderItem(OrderItem orderItem)
+		{
+			if (State != OrderState.Created)
+				throw new InvalidOrderStateException();
+
+			if (OrderItems.Count == 1)
+				throw new NullOrEmptyOrderItemsException();
+
+			OrderItems.Remove(orderItem);
 		}
 	}
 
