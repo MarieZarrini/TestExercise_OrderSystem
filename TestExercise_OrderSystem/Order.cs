@@ -1,4 +1,5 @@
 ﻿using OrderSystem.BusinessExceptions;
+using System.Collections.ObjectModel;
 
 namespace OrderSystem
 {
@@ -6,15 +7,20 @@ namespace OrderSystem
 	{
 		public int UserId { get; private set; }
 		public OrderState State { get; private set; }
-		public List<OrderItem> OrderItems { get; private set; } = new();
 
+		private List<OrderItem> _orderItems = new();
+		public IReadOnlyList<OrderItem> OrderItems
+		{
+			get { return _orderItems.AsReadOnly(); }
+		}
+		
 		public Order(int userId, List<OrderItem> orderItems)
 		{
 			GuardAgainstInvalidOrderItem(orderItems);
 
 			UserId = userId;
 			State = OrderState.Created;
-			OrderItems.AddRange(orderItems);
+			_orderItems.AddRange(orderItems);
 		}
 
 
@@ -24,7 +30,7 @@ namespace OrderSystem
 				throw new NullOrEmptyOrderItemsException();
 		}
 
-		public void SetOrderStateToFinalized()
+		public void Finalized()
 		{
 			if (State == OrderState.shipped)
 				throw new SetStateToFinalizedException();
@@ -32,7 +38,7 @@ namespace OrderSystem
 			State = OrderState.Finalized;
 		}
 
-		public void SetOrderStateToShipped()
+		public void Shipped()
 		{
 			if (State == OrderState.Created)
 				throw new SetStateToShippedException();
@@ -48,7 +54,7 @@ namespace OrderSystem
 			if (State != OrderState.Created)
 				throw new InvalidOrderStateException();
 
-			OrderItems.Add(orderItem);
+			_orderItems.Add(orderItem);
 		}
 
 		public void RemoveOrderItem(OrderItem orderItem)
@@ -59,7 +65,7 @@ namespace OrderSystem
 			if (OrderItems.Count == 1)
 				throw new NullOrEmptyOrderItemsException();
 
-			OrderItems.Remove(orderItem);
+			_orderItems.Remove(orderItem);
 		}
 	}
 
