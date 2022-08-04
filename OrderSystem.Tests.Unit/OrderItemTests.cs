@@ -24,12 +24,12 @@ namespace OrderSystem.Tests.Unit
 		{
 			var orderItemBuilder = new OrderItemBuilder()
 				.WithCount(1)
-				.WithName("test");
+				.WithName("laptop");
 
 			var orderItem = orderItemBuilder.Build();
 
 			Assert.Equal(1, orderItem.Count);
-			Assert.Equal("test", orderItem.Name);
+			Assert.Equal("laptop", orderItem.Name);
 		}
 	}
 }

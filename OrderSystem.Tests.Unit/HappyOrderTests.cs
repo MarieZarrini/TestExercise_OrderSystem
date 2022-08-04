@@ -9,17 +9,19 @@ namespace OrderSystem.Tests.Unit
 		[Fact]
 		public void Order_Should_Create_Correctly()
 		{
+			//arrange
 			var orderItem = new OrderItemBuilder().Build();
+
 			var orderBuilder = new OrderBuilder()
 				.WithUserId(1)
-				.WithDefaultOrderItem(orderItem);
-
+				.WithOrderItem(orderItem);
 			var order = orderBuilder.Build();
 
-			Assert.Equal(1, order.UserId);
+			List<OrderItem> expectedOrderItems = new() { orderItem };
 
-			List<OrderItem> orderItems = new() { orderItem };
-			Assert.Equal(orderItems, order.OrderItems);
+			//assert
+			Assert.Equal(1, order.UserId);
+			order.OrderItems.Should().BeEquivalentTo(expectedOrderItems);
 		}
 
 		[Fact]
@@ -31,22 +33,22 @@ namespace OrderSystem.Tests.Unit
 		}
 
 		[Fact]
-		public void Order_State_Should_Change_To_Finalized_After_Calling_SetOrderStateToFinalized()
+		public void Order_State_Should_Change_To_Finalized_After_Calling_Finalized()
 		{
 			var order = new OrderBuilder().Build();
 
-			order.SetOrderStateToFinalized();
+			order.Finalized();
 
 			order.State.Should().Be(OrderState.Finalized);
 		}
 
 		[Fact]
-		public void Order_State_Should_Change_To_Shipped_After_Calling_SetOrderStateToShipped()
+		public void Order_State_Should_Change_To_Shipped_After_Calling_Shipped()
 		{
 			var order = new OrderBuilder().Build();
 
-			order.SetOrderStateToFinalized();
-			order.SetOrderStateToShipped();
+			order.Finalized();
+			order.Shipped();
 
 			order.State.Should().Be(OrderState.shipped);
 		}
@@ -54,36 +56,50 @@ namespace OrderSystem.Tests.Unit
 		[Fact]
 		public void OrderItem_Should_Add_To_OrderItems_List_Correctly()
 		{
+			//arrange
 			var orderItem = new OrderItemBuilder()
 				.WithCount(2)
-				.WithName("test")
+				.WithName("laptop")
 				.Build();
-
 			var order = new OrderBuilder()
-				.WithDefaultOrderItem(orderItem)
+				.WithOrderItem(orderItem)
 				.Build();
 
-			order.AddOrderItem(orderItem);
-
-			order.OrderItems.Should().HaveCount(2);
-			order.OrderItems[1].Should().Be(orderItem);
-		}
-
-		[Fact]
-		public void OrderItem_Should_Remove_From_OrderItems_List_Correctly()
-		{
-			var orderItem = new OrderItemBuilder().Build();
-			var orderItems = new List<OrderItem>
+			List<OrderItem> expectedOrderItems = new()
 			{
 				orderItem,
 				orderItem
 			};
 
+			//act
+			order.AddOrderItem(orderItem);
+
+			//assert
+			order.OrderItems.Should().BeEquivalentTo(expectedOrderItems);
+		}
+
+		[Fact]
+		public void OrderItem_Should_Remove_From_OrderItems_List_Correctly()
+		{
+			//arrange
+			var firstOrderItem = new OrderItemBuilder().Build();
+			var secondOrderItem = new OrderItemBuilder().WithCount(2).WithName("mobile").Build();
+			var orderItems = new List<OrderItem>
+			{
+				firstOrderItem, secondOrderItem
+			};
 			var order = new OrderBuilder().WithOrderItems(orderItems).Build();
 
-			order.RemoveOrderItem(orderItem);
+			List<OrderItem> expectedOrderItems = new()
+			{
+				secondOrderItem
+			};
 
-			order.OrderItems.Should().HaveCount(1);
+			//act
+			order.RemoveOrderItem(firstOrderItem);
+
+			//assert
+			order.OrderItems.Should().BeEquivalentTo(expectedOrderItems);
 		}
 	}
 }

@@ -32,12 +32,12 @@ namespace OrderSystem.Tests.Unit
 		public void Order_Should_Throw_SetStateToFinalizedException_When_Modify_State_From_Shipped_To_Finalized()
 		{
 			var order = new OrderBuilder().Build();
-			order.SetOrderStateToFinalized();
-			order.SetOrderStateToShipped();
+			order.Finalized();
+			order.Shipped();
 
-			var setOrderStateToFinalized = () => order.SetOrderStateToFinalized();
+			var finalized = () => order.Finalized();
 
-			setOrderStateToFinalized.Should().Throw<SetStateToFinalizedException>();
+			finalized.Should().Throw<SetStateToFinalizedException>();
 		}
 
 		[Fact]
@@ -46,9 +46,9 @@ namespace OrderSystem.Tests.Unit
 			var orderBuilder = new OrderBuilder();
 			var order = orderBuilder.Build();
 
-			var setOrderStateToShipped = () => order.SetOrderStateToShipped();
+			var shipped = () => order.Shipped();
 
-			setOrderStateToShipped.Should().Throw<SetStateToShippedException>();
+			shipped.Should().Throw<SetStateToShippedException>();
 		}
 
 		[Fact]
@@ -66,7 +66,7 @@ namespace OrderSystem.Tests.Unit
 		{
 			var orderItem = new OrderItemBuilder().Build();
 			var order = new OrderBuilder().Build();
-			order.SetOrderStateToFinalized();
+			order.Finalized();
 
 			var addOrderItem = () => order.AddOrderItem(orderItem);
 
@@ -79,9 +79,8 @@ namespace OrderSystem.Tests.Unit
 			var orderItem = new OrderItemBuilder().Build();
 			var order = new OrderBuilder().Build();
 
-			order.SetOrderStateToFinalized();
-			order.SetOrderStateToShipped();
-
+			order.Finalized();
+			order.Shipped();
 			var addOrderItem = () => order.AddOrderItem(orderItem);
 
 			addOrderItem.Should().Throw<InvalidOrderStateException>();
@@ -92,8 +91,8 @@ namespace OrderSystem.Tests.Unit
 		{
 			var orderItem = new OrderItemBuilder().Build();
 			var order = new OrderBuilder().Build();
-			order.SetOrderStateToFinalized();
 
+			order.Finalized();
 			var removeOrderItem = () => order.RemoveOrderItem(orderItem);
 
 			removeOrderItem.Should().Throw<InvalidOrderStateException>();
@@ -105,9 +104,8 @@ namespace OrderSystem.Tests.Unit
 			var orderItem = new OrderItemBuilder().Build();
 			var order = new OrderBuilder().Build();
 
-			order.SetOrderStateToFinalized();
-			order.SetOrderStateToShipped();
-
+			order.Finalized();
+			order.Shipped();
 			var removeOrderItem = () => order.RemoveOrderItem(orderItem);
 
 			removeOrderItem.Should().Throw<InvalidOrderStateException>();
