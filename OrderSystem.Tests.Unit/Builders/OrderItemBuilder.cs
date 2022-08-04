@@ -8,7 +8,7 @@
 		public OrderItemBuilder()
 		{
 			_count = 2;
-			_name = "test";
+			_name = "laptop";
 		}
 
 

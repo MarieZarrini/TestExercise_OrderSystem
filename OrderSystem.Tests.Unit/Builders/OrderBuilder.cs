@@ -27,7 +27,7 @@ namespace OrderSystem.Tests.Unit
 			return this;
 		}
 
-		public OrderBuilder WithDefaultOrderItem(OrderItem orderItem)
+		public OrderBuilder WithOrderItem(OrderItem orderItem)
 		{
 			this.orderItem = orderItem;
 			return this;
