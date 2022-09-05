@@ -1,4 +1,6 @@
 ﻿using FluentAssertions;
+using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 using OrderSystem.BusinessExceptions;
 using OrderSystem.Tests.Unit.Factories;
 using System.Collections.Generic;
@@ -20,13 +22,26 @@ namespace OrderSystem.Tests.Unit
 		}
 
 
+
 		#region Happy Tests
+
+		[Fact]
+		public void Order_Should_Send_Message_At_Creation_Time()
+		{
+			const string message = "New order just submited.";
+			const string phoneNumber = "0912";
+			var messageServiceMock = Substitute.For<IMessageService>();
+			_orderBuilder.WithMessageService(messageServiceMock).Build();
+
+			messageServiceMock.Received().Send(message, phoneNumber);
+		}
 
 		[Fact]
 		public void Order_Should_Create_Correctly()
 		{
 			var orderItem = _orderItemFactory.GetSomeOrderItem();
-			var order = _orderFactory.GetSomeOrder(1, orderItem);
+			//var order = _orderFactory.GetSomeOrder(1, orderItem);
+			var order = _orderBuilder.WithUserId(1).WithOrderItem(orderItem).Build();
 			List<OrderItem> expectedOrderItems = new() { orderItem };
 
 			order.UserId.Should().Be(1);
@@ -104,6 +119,19 @@ namespace OrderSystem.Tests.Unit
 		#endregion
 
 		#region Unhappy Tests
+
+		[Fact]
+		public void Order_Should_Throw_NullOrderException_If_Order_Does_Not_Exists()
+		{
+			const int orderId = 1;
+			var orderRepositoryStub = Substitute.For<IOrderRepository>();
+			orderRepositoryStub.GetById(orderId).ReturnsNull();
+			var order = _orderBuilder.WithOrderRepository(orderRepositoryStub).Build();
+
+			var getOrderById = () => order.GetOrderById(orderId);
+
+			getOrderById.Should().Throw<NullOrderException>();
+		}
 
 		[Fact]
 		public void Order_Should_Throw_NullOrEmptyOrderItemsException_If_OrderItems_Is_Empty()

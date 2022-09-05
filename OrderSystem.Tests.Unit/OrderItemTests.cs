@@ -8,10 +8,12 @@ namespace OrderSystem.Tests.Unit
 	public class OrderItemTests
 	{
 		private readonly OrderItemFactory _orderItemFactory;
+		private readonly OrderItemBuilder _orderItemBuilder;
 
 		public OrderItemTests()
 		{
 			_orderItemFactory = new OrderItemFactory();
+			_orderItemBuilder = new OrderItemBuilder();
 		}
 
 
@@ -29,7 +31,8 @@ namespace OrderSystem.Tests.Unit
 		[Fact]
 		public void OrderItem_Should_Be_Created_Correctly()
 		{
-			var orderItem = _orderItemFactory.GetSomeOrderItem(1, "laptop");
+			//var orderItem = _orderItemFactory.GetSomeOrderItem(1, "laptop");
+			var orderItem = _orderItemBuilder.WithCount(1).WithName("laptop").Build(); ;
 
 			Assert.Equal(1, orderItem.Count);
 			Assert.Equal("laptop", orderItem.Name);
