@@ -7,20 +7,26 @@ namespace OrderSystem
 	{
 		public int UserId { get; private set; }
 		public OrderState State { get; private set; }
-
 		private List<OrderItem> _orderItems = new();
+		private readonly IMessageService _messageService;
+		private readonly IOrderRepository _orderRepository;
+
 		public IReadOnlyList<OrderItem> OrderItems
 		{
 			get { return _orderItems.AsReadOnly(); }
 		}
-		
-		public Order(int userId, List<OrderItem> orderItems)
+
+		public Order(int userId, List<OrderItem> orderItems, IMessageService messageService, IOrderRepository orderRepository)
 		{
 			GuardAgainstInvalidOrderItem(orderItems);
 
 			UserId = userId;
 			State = OrderState.Created;
 			_orderItems.AddRange(orderItems);
+			_messageService = messageService;
+			_orderRepository = orderRepository;
+
+			NotifyUser();
 		}
 
 
@@ -28,6 +34,14 @@ namespace OrderSystem
 		{
 			if (orderItems == null || orderItems.Count == 0)
 				throw new NullOrEmptyOrderItemsException();
+		}
+
+		private void NotifyUser()
+		{
+			const string message = "New order just submited.";
+			const string phoneNumber = "0912";
+
+			_messageService.Send(message, phoneNumber);
 		}
 
 		public void Finalized()
@@ -66,6 +80,16 @@ namespace OrderSystem
 				throw new NullOrEmptyOrderItemsException();
 
 			_orderItems.Remove(orderItem);
+		}
+
+		public Order GetOrderById(int id)
+		{
+			var order = _orderRepository.GetById(id);
+			
+			if(order == null)
+				throw new NullOrderException();
+
+			return order;
 		}
 	}
 
