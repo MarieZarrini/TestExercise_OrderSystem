@@ -5,18 +5,12 @@ namespace OrderSystem
 {
 	public class Order
 	{
-		public int UserId { get; private set; }
-		public OrderState State { get; private set; }
-		private List<OrderItem> _orderItems = new();
+		
+		private readonly List<OrderItem> _orderItems = new();
 		private readonly IMessageService _messageService;
 		private readonly IOrderRepository _orderRepository;
-
-		public IReadOnlyList<OrderItem> OrderItems
-		{
-			get { return _orderItems.AsReadOnly(); }
-		}
-
-		public Order(int userId, List<OrderItem> orderItems, IMessageService messageService, IOrderRepository orderRepository)
+		
+        public Order(int userId, List<OrderItem> orderItems, IMessageService messageService, IOrderRepository orderRepository)
 		{
 			GuardAgainstInvalidOrderItem(orderItems);
 
@@ -29,8 +23,12 @@ namespace OrderSystem
 			NotifyUser();
 		}
 
+        public int UserId { get; private set; }
+        public OrderState State { get; private set; }
+        public IEnumerable<OrderItem> OrderItems => _orderItems.AsReadOnly();
 
-		private static void GuardAgainstInvalidOrderItem(List<OrderItem> orderItems)
+
+        private static void GuardAgainstInvalidOrderItem(List<OrderItem> orderItems)
 		{
 			if (orderItems == null || orderItems.Count == 0)
 				throw new NullOrEmptyOrderItemsException();
@@ -76,7 +74,7 @@ namespace OrderSystem
 			if (State != OrderState.Created)
 				throw new InvalidOrderStateException();
 
-			if (OrderItems.Count == 1)
+			if (OrderItems.Count() == 1)
 				throw new NullOrEmptyOrderItemsException();
 
 			_orderItems.Remove(orderItem);
