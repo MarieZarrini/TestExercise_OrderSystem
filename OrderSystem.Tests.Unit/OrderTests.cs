@@ -4,6 +4,7 @@ using NSubstitute.ReturnsExtensions;
 using OrderSystem.BusinessExceptions;
 using OrderSystem.Tests.Unit.Factories;
 using System.Collections.Generic;
+using OrderSystem.Tests.Unit.Constants;
 using Xunit;
 
 namespace OrderSystem.Tests.Unit
@@ -28,12 +29,10 @@ namespace OrderSystem.Tests.Unit
 		[Fact]
 		public void Order_Should_Send_Message_At_Creation_Time()
 		{
-			const string message = "New order just submited.";
-			const string phoneNumber = "0912";
 			var messageServiceMock = Substitute.For<IMessageService>();
 			_orderBuilder.WithMessageService(messageServiceMock).Build();
 
-			messageServiceMock.Received().Send(message, phoneNumber);
+			messageServiceMock.Received().Send(OrderSubmittedMessage.message, OrderSubmittedMessage.phoneNumber);
 		}
 
 		[Fact]
